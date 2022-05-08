@@ -78,17 +78,16 @@ function main() {
 class Solution
 {
     //Heapify function to maintain heap property.
-    heapify(arr,n,i)
-    {
+    heapify(arr,n,i) {
       let index = i;
-      let largest = arr[index - 1];
-      if (2 * index <= n && arr[2 * index - 1] > largest) {
-        largest =  arr[2 * index - 1];
-        index = 2 * index;
+      let largest = arr[i - 1];
+      if (2 * i <= n && arr[2 * i - 1] > largest) {
+        largest =  arr[2 * i - 1];
+        index = 2 * i;
       }
-      if (2 * index <= n - 1 && arr[2 * index] > largest) {
+      if (2 * i <= n - 1 && arr[2 * i] > largest) {
         largest = arr[2 * i];
-        index = 2 * index + 1;
+        index = 2 * i + 1;
       }
       if (index !== i) {
         arr[index - 1] = arr[i - 1];
