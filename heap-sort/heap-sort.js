@@ -108,12 +108,13 @@ class Solution
     {
     //code here
       let totalLength = n;
+      this.buildHeap(arr, totalLength);
       while (totalLength >= 2) {
-        this.buildHeap(arr, totalLength);
         const largest = arr[0];
         arr[0] = arr[totalLength - 1];
-        arr[totalLength - 1] = largest
+        arr[totalLength - 1] = largest;
         totalLength--;
+        this.heapify(arr, totalLength, 1);
       }
     }
 }
