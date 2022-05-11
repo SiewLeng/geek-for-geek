@@ -97,15 +97,15 @@ class Solution
       const rigthChildIndex = 2 * index + 1;
       let largestValueIndex = index;
       let largestValue = arr[index - 1];
-      if (leftChildIndex < stopIndex + 1 &&
+      if (leftChildIndex <= stopIndex &&
         arr[leftChildIndex - 1] > largestValue) {
         largestValue = arr[leftChildIndex - 1];
-        index = leftChildIndex;
+        largestValueIndex = leftChildIndex;
       }
-      if (rigthChildIndex < stopIndex + 1 &&
+      if (rigthChildIndex <= stopIndex &&
         arr[rigthChildIndex - 1] > largestValue) {
         largestValue = arr[rigthChildIndex - 1];
-        index = rigthChildIndex;
+        largestValueIndex = rigthChildIndex;
       }
       if (largestValueIndex !== index) {
         this.swapArray(index - 1, largestValueIndex - 1, arr);
@@ -150,6 +150,7 @@ class Solution
           n = n - 1;
           this.heapifyFromTopToBottom(1, n, array);
         }
+        console.log(array);
         return this.getMedianFromArray(array);
     } 
 }
