@@ -49,7 +49,7 @@ function main() {
     for(let j = 0;j<n;j++){
       let x = parseInt(readLine());
       obj.insertHeap(x);
-      // console.log(Math.floor(obj.getMedian()));
+      console.log(Math.floor(obj.getMedian()));
     }
   }
 }
@@ -78,7 +78,7 @@ class Solution
       arr[b] = temp;
     }
 
-    heapifyFromBottomToTop (index, arr) {
+    heapifyMaxHeapFromBottomToTop (index, arr) {
       // index = index of array + 1;
       if (index > 1) {
         const parentIndex = Math.floor(index / 2);
@@ -86,12 +86,25 @@ class Solution
         const currentValue = arr[index - 1];
         if (currentValue > parentValue) {
           this.swapArray(parentIndex - 1, index - 1, arr);
-          this.heapifyFromBottomToTop(parentIndex, arr);
+          this.heapifyMaxHeapFromBottomToTop(parentIndex, arr);
         }
       }
     }
 
-    heapifyFromTopToBottom (index, stopIndex, arr) {
+    heapifyMinHeapFromBottomToTop (index, arr) {
+      // index = index of array + 1;
+      if (index > 1) {
+        const parentIndex = Math.floor(index / 2);
+        const parentValue = arr[parentIndex - 1];
+        const currentValue = arr[index - 1];
+        if (currentValue < parentValue) {
+          this.swapArray(parentIndex - 1, index - 1, arr);
+          this.heapifyMinHeapFromBottomToTop(parentIndex, arr);
+        }
+      }
+    }
+
+    heapifyMaxHeapFromTopToBottom (index, stopIndex, arr) {
       // index = index of array + 1;
       const leftChildIndex = 2 * index;
       const rigthChildIndex = 2 * index + 1;
@@ -109,7 +122,29 @@ class Solution
       }
       if (largestValueIndex !== index) {
         this.swapArray(index - 1, largestValueIndex - 1, arr);
-        this.heapifyFromTopToBottom(largestValueIndex, stopIndex, arr);
+        this.heapifyMaxHeapFromTopToBottom(largestValueIndex, stopIndex, arr);
+      }
+    }
+
+    heapifyMinHeapFromTopToBottom (index, stopIndex, arr) {
+      // index = index of array + 1;
+      const leftChildIndex = 2 * index;
+      const rigthChildIndex = 2 * index + 1;
+      let largestValueIndex = index;
+      let largestValue = arr[index - 1];
+      if (leftChildIndex <= stopIndex &&
+        arr[leftChildIndex - 1] < largestValue) {
+        largestValue = arr[leftChildIndex - 1];
+        largestValueIndex = leftChildIndex;
+      }
+      if (rigthChildIndex <= stopIndex &&
+        arr[rigthChildIndex - 1] < largestValue) {
+        largestValue = arr[rigthChildIndex - 1];
+        largestValueIndex = rigthChildIndex;
+      }
+      if (largestValueIndex !== index) {
+        this.swapArray(index - 1, largestValueIndex - 1, arr);
+        this.heapifyMinHeapFromTopToBottom(largestValueIndex, stopIndex, arr);
       }
     }
 
@@ -119,7 +154,7 @@ class Solution
         if (this.maxHeap.length === 0 && this.minHeap.length === 0) {
             this.maxHeap.push(x);
         } else if (this.maxHeap.length === 1 && this.minHeap.length === 0) {
-            if (x < this.maxHeap[0]) {
+            if (x <= this.maxHeap[0]) {
                 this.minHeap.push(this.maxHeap[0])
                 this.maxHeap[0] = x;
             } else {
@@ -127,15 +162,55 @@ class Solution
             }
         } else {
             if (x > this.minHeap[0]) {
+                // x belongs to minHeap
                 this.minHeap.push(x);
-                this.heapifyFromBottomToTop(this.minHeap.length, this.minHeap);
+                this.heapifyMinHeapFromBottomToTop(this.minHeap.length, this.minHeap);
                 this.balanceHeaps();
             } else {
+                // x belongs to maxHeap
                 this.maxHeap.push(x);
-                this.heapifyFromBottomToTop(this.maxHeap.length, this.maxHeap);
+                this.heapifyMaxHeapFromBottomToTop(this.maxHeap.length, this.maxHeap);
                 this.balanceHeaps();
             }
         }
+    }
+
+    checkMinHeap() {
+      let result = true;
+      for (let index = 1; index < Math.floor(this.minHeap.length) + 1; index++) {
+        const leftChildIndex = 2 * index;
+        const rightChildIndex = 2 * index + 1;
+        if (leftChildIndex < this.minHeap.length + 1 && 
+          this.minHeap[leftChildIndex - 1] < this.minHeap[index - 1]) {
+          result = false;
+          break;
+        }
+        if (rightChildIndex < this.minHeap.length + 1 && 
+          this.minHeap[rightChildIndex - 1] < this.minHeap[index - 1]) {
+          result = false;
+          break;
+        }
+      }
+      return result;
+    }
+
+    checkMaxHeap() {
+      let result = true;
+      for (let index = 1; index < Math.floor(this.maxHeap.length) + 1; index++) {
+        const leftChildIndex = 2 * index;
+        const rightChildIndex = 2 * index + 1;
+        if (leftChildIndex < this.maxHeap.length + 1 && 
+          this.maxHeap[leftChildIndex - 1] > this.maxHeap[index - 1]) {
+          result = false;
+          break;
+        }
+        if (rightChildIndex < this.maxHeap.length + 1 && 
+          this.maxHeap[rightChildIndex - 1] > this.maxHeap[index - 1]) {
+          result = false;
+          break;
+        }
+      }
+      return result;
     }
     
      // Function to balance Heaps
@@ -146,16 +221,16 @@ class Solution
             const minHeapValueToExtract = this.minHeap[0];
             this.swapArray(0, this.minHeap.length - 1, this.minHeap);
             this.minHeap.splice(this.minHeap.length - 1, 1);
-            this.heapifyFromTopToBottom(1, this.minHeap.length, this.minHeap);
+            this.heapifyMinHeapFromTopToBottom(1, this.minHeap.length, this.minHeap);
             this.maxHeap.push(minHeapValueToExtract);
-            this.heapifyFromBottomToTop(this.maxHeap.length, this.maxHeap);
+            this.heapifyMaxHeapFromBottomToTop(this.maxHeap.length, this.maxHeap);
        } else if (this.maxHeap.length - this.minHeap.length == 2) {
             const maxHeapValueToExtract = this.maxHeap[0];
             this.swapArray(0, this.maxHeap.length - 1, this.maxHeap);
             this.maxHeap.splice(this.maxHeap.length - 1, 1);
-            this.heapifyFromTopToBottom(1, this.maxHeap.length, this.maxHeap);
+            this.heapifyMaxHeapFromTopToBottom(1, this.maxHeap.length, this.maxHeap);
             this.minHeap.push(maxHeapValueToExtract);
-            this.heapifyFromBottomToTop(this.minHeap.length, this.minHeap);
+            this.heapifyMinHeapFromBottomToTop(this.minHeap.length, this.minHeap);
        }
     }
 
@@ -163,5 +238,15 @@ class Solution
     getMedian()
     {
         // add your code here
+        if (this.minHeap.length === this.maxHeap.length) {
+          return ((this.minHeap[0] + this.maxHeap[0]) / 2);
+        }
+        if (this.minHeap.length - this.maxHeap.length === 1)  {
+          return this.minHeap[0];
+        }
+        if (this.maxHeap.length - this.minHeap.length === 1) {
+          return this.maxHeap[0];
+        }
+        return null;
     } 
 }
